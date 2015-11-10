@@ -2,6 +2,7 @@ from nipype.pipeline.engine import Workflow, Node
 from nipype.interfaces import ants
 from nipype.interfaces import afni as afni
 from nipype.interfaces import io as nio
+import python_utils as pu
 import nipype.interfaces.utility as util
 import os
 import ants_extensions as ae
@@ -41,7 +42,12 @@ segflow = Workflow(name='segmentation_flow')
 segflow.base_dir = os.path.abspath(BASE_DIR)
 segflow.connect([
                     (lowres,mask_air,[('out_file','input_volume')]),
-                    (mask_air,highres,[('output_volume','in_file')]),
+                    (lowres,mask_body,[('out_file','input_volume')]),
+                    (mask_body,cut_largest,[('out_file','input_volume')]),
+                    (cut_largest,fill_holes,[('out_file','input_volume')]),
+                    (fill_holes,pu.Logic,[('out_file','input_volume')]),
+                    (mask_air,highres,[('output_volume','in_file')])
+
                 ])
 
 
